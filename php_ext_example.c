@@ -65,11 +65,37 @@ PHP_FUNCTION(confirm_php_ext_example_compiled)
 	RETURN_STRINGL(strg, len, 0);
 }
 /* }}} */
-/* The previous line is meant for vim and emacs, so it can correctly fold and 
-   unfold functions in source code. See the corresponding marks just before 
-   function definition, where the functions purpose is also documented. Please 
+/* The previous line is meant for vim and emacs, so it can correctly fold and
+   unfold functions in source code. See the corresponding marks just before
+   function definition, where the functions purpose is also documented. Please
    follow this convention for the convenience of others editing your code.
 */
+
+PHP_FUNCTION(self_concat)
+{
+	char *str = NULL;
+    int argc = ZEND_NUM_ARGS();
+    int str_len;
+    long n;
+    char *result;
+    char *ptr;
+    int result_length;
+
+    if (zend_parse_parameters(argc TSRMLS_CC, "sl", &str, &str_len, &n) == FAILURE)
+        return;
+
+    result_length = (str_len * n);
+    result = (char *) emalloc(result_length + 1);
+    ptr = result;
+
+    while (n--) {
+        memcpy(ptr, str, str_len);
+        ptr += str_len;
+    }
+
+    ptr = '\0';
+    RETURN_STRINGL(result, result_length, 0);
+}
 
 
 /* {{{ php_php_ext_example_init_globals
@@ -87,7 +113,7 @@ static void php_php_ext_example_init_globals(zend_php_ext_example_globals *php_e
  */
 PHP_MINIT_FUNCTION(php_ext_example)
 {
-	/* If you have INI entries, uncomment these lines 
+	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
 	return SUCCESS;
