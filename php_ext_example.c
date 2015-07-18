@@ -169,6 +169,7 @@ PHP_MINFO_FUNCTION(php_ext_example)
  */
 const zend_function_entry php_ext_example_functions[] = {
 	PHP_FE(confirm_php_ext_example_compiled,	NULL)		/* For testing, remove later. */
+	PHP_FE(self_concat, NULL)
 	PHP_FE_END	/* Must be the last line in php_ext_example_functions[] */
 };
 /* }}} */
