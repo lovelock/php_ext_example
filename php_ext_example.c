@@ -115,10 +115,27 @@ PHP_METHOD(SampleClass, sayHello)
 
 PHP_METHOD(SampleClass, getFoo)
 {
+	zval *obj, *foo_value;
+
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+
+	obj = getThis();
+	foo_value = zend_read_property(php_ext_example_class_entry, obj, "foo", sizeof("foo") - 1, 1 TSRMLS_CC);
+	RETURN_ZVAL(foo_value, 1, 0);
 }
 
 PHP_METHOD(SampleClass, setFoo)
 {
+	zval *obj, *new_foo_value;
+
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+
+	obj = getThis();
+	zend_update_property(php_ext_example_class_entry, obj, "foo", sizeof("foo") - 1, new_foo_value TSRMLS_CC);
 }
 /* {{{ php_ext_example_functions[]
  *
