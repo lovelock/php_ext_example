@@ -34,6 +34,8 @@ ZEND_DECLARE_MODULE_GLOBALS(php_ext_example)
 /* True global resources - no need for thread safety here */
 static int le_php_ext_example;
 
+php_class_entry *php_ext_example_class_entry;
+
 /* {{{ PHP_INI
  */
 /* Remove comments and fill if you need to have entries in php.ini
@@ -116,6 +118,9 @@ PHP_MINIT_FUNCTION(php_ext_example)
 	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
+	zend_class_entry *temp_ce;
+	INIT_CLASS_ENTRY(temp_ce, "SampleClass", php_ext_example_functions);
+	php_ext_example_class_entry = zend_register_internal_class(&temp_ce, TSRMLS_CC);
 	return SUCCESS;
 }
 /* }}} */
@@ -169,6 +174,7 @@ PHP_MINFO_FUNCTION(php_ext_example)
  */
 const zend_function_entry php_ext_example_functions[] = {
 	PHP_FE(confirm_php_ext_example_compiled,	NULL)		/* For testing, remove later. */
+	PHP_ME(SampleClass, sayHello, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE(self_concat, NULL)
 	PHP_FE_END	/* Must be the last line in php_ext_example_functions[] */
 };
