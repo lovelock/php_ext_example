@@ -34,7 +34,8 @@ ZEND_DECLARE_MODULE_GLOBALS(php_ext_example)
 /* True global resources - no need for thread safety here */
 static int le_php_ext_example;
 
-php_class_entry *php_ext_example_class_entry;
+zend_class_entry *php_ext_example_class_entry;
+
 
 /* {{{ PHP_INI
  */
@@ -99,6 +100,39 @@ PHP_FUNCTION(self_concat)
     RETURN_STRINGL(result, result_length, 0);
 }
 
+PHP_METHOD(SampleClass, sayHello)
+{
+	char *name, *str_hello;
+	int name_len, str_hello_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
+		RETURN_NULL();
+	}
+
+	str_hello_len = spprintf(&str_hello, 0, "Hello, %s, You are welcome!\n", name);
+	RETURN_STRINGL(str_hello, str_hello_len, 0);
+}
+
+PHP_METHOD(SampleClass, getFoo)
+{
+}
+
+PHP_METHOD(SampleClass, setFoo)
+{
+}
+/* {{{ php_ext_example_functions[]
+ *
+ * Every user visible function must have an entry in php_ext_example_functions[].
+ */
+const zend_function_entry php_ext_example_functions[] = {
+	PHP_ME(SampleClass, sayHello, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(SampleClass, getFoo, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(SampleClass, setFoo, NULL, ZEND_ACC_PUBLIC)
+	PHP_FE(confirm_php_ext_example_compiled,	NULL)		/* For testing, remove later. */
+	PHP_FE(self_concat, NULL)
+	PHP_FE_END	/* Must be the last line in php_ext_example_functions[] */
+};
+/* }}} */
 
 /* {{{ php_php_ext_example_init_globals
  */
@@ -118,9 +152,9 @@ PHP_MINIT_FUNCTION(php_ext_example)
 	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
-	zend_class_entry *temp_ce;
+	zend_class_entry temp_ce;
 	INIT_CLASS_ENTRY(temp_ce, "SampleClass", php_ext_example_functions);
-	php_ext_example_class_entry = zend_register_internal_class(&temp_ce, TSRMLS_CC);
+	php_ext_example_class_entry = zend_register_internal_class(&temp_ce TSRMLS_CC);
 	return SUCCESS;
 }
 /* }}} */
@@ -168,17 +202,6 @@ PHP_MINFO_FUNCTION(php_ext_example)
 }
 /* }}} */
 
-/* {{{ php_ext_example_functions[]
- *
- * Every user visible function must have an entry in php_ext_example_functions[].
- */
-const zend_function_entry php_ext_example_functions[] = {
-	PHP_FE(confirm_php_ext_example_compiled,	NULL)		/* For testing, remove later. */
-	PHP_ME(SampleClass, sayHello, NULL, ZEND_ACC_PUBLIC)
-	PHP_FE(self_concat, NULL)
-	PHP_FE_END	/* Must be the last line in php_ext_example_functions[] */
-};
-/* }}} */
 
 /* {{{ php_ext_example_module_entry
  */
